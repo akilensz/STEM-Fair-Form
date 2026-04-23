@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Pre-Order Form</title>
+
+<style>
+body {
+    font-family: Arial;
+    background-color: rgb(235, 188, 171);
+}
+
+.container {
+    width: 500px;
+    margin: auto;
+    background: rgb(245, 237, 234);
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 50px;
+}
+
+input, select {
+    width: 95%;
+    padding: 8px;
+    margin: 8px 0;
+}
+
+#terms {
+    width: auto;
+}
+
+button {
+    padding: 10px;
+    width: 100%;
+    margin-top: 5px;
+    background-color: #b95637;
+    color: white;
+    border: none;
+}
+
+.error {
+    color: red;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<h2>Vent it out!</h2>
+
+<p>“Vent It Out.” It’s a system designed not just to filter air, but to capture smoke at its source. 
+    It doesn’t wait for the air to clean itself. It takes action. 
+    Don’t just avoid the smoke. Eliminate it. Thank you. </p>
+
+<div id="errorMsg" class="error"></div>
+
+<form onsubmit="return handleOrder()">
+
+<label>Name:</label>
+<input type="text" id="name">
+
+<label>Product size:</label>
+<select id="variant">
+<option value="">Select</option>
+<option value="1 Meter-350">1 Meter (PHP 350)</option>
+<option value="2 Meters-600">2 Meters (PHP 600)</option>
+</select>
+
+<label>Quantity:</label>
+<input type="number" id="quantity">
+
+<label>Pickup Method:</label>
+<select id="pickup">
+<option value="">Select</option>
+<option value="Delivery">Delivery</option>
+<option value="Meetup">Meetup</option>
+</select>
+
+<label>Address (for delivery only):</label>
+<input type="text" id="address">
+
+<label>
+<input type="checkbox" id="terms"> I accept terms
+</label>
+
+<br><br>
+
+<button type="button" onclick="loadPreviousOrder()">Load Previous Order</button>
+<button type="submit">Submit</button>
+
+</form>
+</div>
+
+<script>
+
+// COOKIE FUNCTIONS
+function setCookie(name, value, maxAge) {
+    document.cookie = name + "=" + value + "; max-age=" + maxAge + "; path=/";
+}
+
+function getCookie(name) {
+    let cookies = document.cookie.split(";");
+    for (let c of cookies) {
+        let [key, val] = c.trim().split("=");
+        if (key === name) return val;
+    }
+    return "";
+}
+
+// VALIDATION
+function validateForm(name, variant, quantity, pickup, address, terms) {
+    let errors = [];
+
+    if (!name || !variant || !quantity || !pickup) {
+        errors.push("All fields must not be empty");
+    }
+
+    if (quantity <= 0) {
+        errors.push("Quantity must be greater than 0");
+    }
+
+    if (!terms) {
+        errors.push("You must accept the terms");
+    }
+
+    if (pickup === "Delivery" && !address) {
+        errors.push("Address is required for delivery");
+    }
+
+    return errors;
+}
+
+// MAIN HANDLER
+function handleOrder() {
+    let errorBox = document.getElementById("errorMsg");
+    errorBox.innerHTML = "";
+
+    let name = document.getElementById("name").value;
+    let variant = document.getElementById("variant").value;
+    let quantity = document.getElementById("quantity").value;
+    let pickup = document.getElementById("pickup").value;
+    let address = document.getElementById("address").value;
+    let terms = document.getElementById("terms").checked;
+
+    let errors = validateForm(name, variant, quantity, pickup, address, terms);
+
+    if (errors.length > 0) {
+        errorBox.innerHTML = errors.join("<br>");
+        return false;
+    }
+
+    // STORE DATA
+    setCookie("customerName", name, 86400); // 1 day
+
+    localStorage.setItem("variant", variant);
+    localStorage.setItem("quantity", quantity);
+    localStorage.setItem("pickup", pickup);
+    localStorage.setItem("address", address);
+
+    // REDIRECT
+    window.location.href = "summary.html";
+    return false;
+}
+
+// LOAD PREVIOUS ORDER
+function loadPreviousOrder() {
+    let name = getCookie("customerName");
+    let variant = localStorage.getItem("variant");
+
+
+    if (!name && !variant) {
+        document.getElementById("errorMsg").innerHTML = "No previous order data";
+        return;
+    }
+
+
+    document.getElementById("name").value = name;
+    document.getElementById("variant").value = variant;
+    document.getElementById("quantity").value = localStorage.getItem("quantity");
+    document.getElementById("pickup").value = localStorage.getItem("pickup");
+    document.getElementById("address").value = localStorage.getItem("address");
+}
+
+
+</script>
+
+</body>
+</html>

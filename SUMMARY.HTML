@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Order Summary</title>
+</head>
+
+
+<body>
+
+
+<h2>Order Summary</h2>
+
+
+<p id="output"></p>
+
+
+<script>
+
+
+// GET COOKIE
+function getCookie(name) {
+    let cookies = document.cookie.split(";");
+    for (let c of cookies) {
+        let [key, val] = c.trim().split("=");
+        if (key === name) return val;
+    }
+    return "";
+}
+
+
+// LOAD DATA
+let name = getCookie("customerName");
+let variant = localStorage.getItem("variant");
+let quantity = localStorage.getItem("quantity");
+let pickup = localStorage.getItem("pickup");
+let address = localStorage.getItem("address");
+
+
+// EXTRACT PRICE
+let parts = variant.split("-");
+let productName = parts[0];
+let price = parseInt(parts[1]);
+
+
+let total = price * quantity;
+
+
+// DISPLAY
+document.getElementById("output").innerHTML = `
+Name: ${name} <br>
+Product: ${productName} <br>
+Quantity: ${quantity} <br>
+Total: PHP ${total} <br>
+Pickup: ${pickup} <br>
+Address: ${pickup === "Delivery" ? address : "N/A"} <br><br>
+Thank you for your order!
+`;
+
+
+</script>
+
+
+</body>
+</html>
